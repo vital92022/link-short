@@ -1,21 +1,50 @@
 <?php
 include 'connect.php';
 
-$requset = trim($_GET['link_chort']);
+$requset = trim($_GET['link_short']);
 $requset = mysqli_real_escape_string($conn, $requset);
 
-if (!empty($requset)) {
-	$sel = mysqli_query($conn, "SELECT * FROM `links` WHERE `link` = '".$requset."'");
+if (isset($_GET['link_short'])) {
+	$search_bool = false;
+	$token = '';
 
-	if (!mysqli_num_rows($sel)) {
-		$ins = mysqli_query($conn, "INSERT INTO `links` (`link`, `token`) VALUE ('".$requset."','".token_gen()."')");
+	while (!$search_bool) {
+		$token = token_gen();
+		$sel = mysqli_query($conn, "SELECT * FROM `links` WHERE `token` = '".$token."'");
+
+		if (!mysqli_num_rows($sel)) {
+			$search_bool = true;
+			break;
+		}
+	}
+
+
+	if ($search_bool) {
+		$ins = mysqli_query($conn, "INSERT INTO `links` (`link`, `token`) VALUES ('".$requset."','".$token."')");
+
 		if ($ins) {
-			echo "Ссылка добавлена";
+			$_GET['link_short'] = $_SERVER['SERVER_NAME'].'/'.$token;
+			//echo "Ссылка добавлена";
 		} else {
-			echo "Ссылка не добавлена";
+			//echo "Ссылка не добавлена";
 		}
 	} else {
-		echo "Всё плохо";
+		//echo "Всё плохо";
+	}
+} else {
+	$URI = $_SERVER['REQUEST_URI'];
+	$token = substr($URI, 1);
+
+	if (iconv_strlen($token)) {
+		$sel = mysqli_query($conn, "SELECT * FROM `links` WHERE `token` = '".$token."'");
+
+		if (mysqli_num_rows($sel)) {
+			$row = mysqli_fetch_assoc($sel);
+
+			header("Location: " . $row['link']);
+		} else {
+			die("Ошибак токена");
+		}
 	}
 }
 

@@ -18,7 +18,7 @@ include 'request.php';
 		<div class="row">
 			<form action="" method="GET">
 				<div class="input-group mb-3">
-				  <input type="text" name="link_chort" class="form-control" placeholder="Вставьте ссылку" aria-label="Recipient's username" aria-describedby="button-addon2">
+				  <input type="text" value="<?=$_GET['link_short'];?>" name="link_short" class="form-control" placeholder="Вставьте ссылку" aria-label="Recipient's username" aria-describedby="button-addon2">
 				  <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Выполнить</button>
 				</div>
 			</form>
